@@ -52,33 +52,71 @@
 --|    s_<signal name>          = state name
 --|
 --+----------------------------------------------------------------------------
-library ieee;
+library ieee; --  group that defines standards, what means 0 and what means 1 (true/false)
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 
 
-entity top_basys3 is
-	port(
+entity top_basys3 is -- hey define a black box, making a black box that is called top_basus3
+	port( 
+	   -- punching a hole name sw (sw0, sw1, and sw2)
 		-- Switches
-		sw		:	in  std_logic_vector(2 downto 0);
-		
+		sw		:	in  std_logic_vector(2 downto 0); -- vector is multiple bits
+		-- punching a hole name led (led0 and led1)
 		-- LEDs
 		led	    :	out	std_logic_vector(1 downto 0)
+		-- matches the name in the master doc
 	);
 end top_basys3;
 
-architecture top_basys3_arch of top_basys3 is 
+architecture top_basys3_arch of top_basys3 is -- what does this box looks like on the inside
 	
+  -- references halfAdder.vdh
   -- declare the component of your top-level design 
+  component halfAdder is -- similar to entity, but means find a black box
+  port ( -- 4 ports (2 input and 2 outputs)
+  i_A : in std_logic; -- one bit
+  i_B : in std_logic;
+  o_S : out std_logic;
+  o_Cout : out std_logic
+  );
+  
+ end component halfAdder;
 
   -- declare any signals you will need	
-  
+--  signal w_led1 : std_logic := '0'; 
+ -- signal w_led0: std_logic := '0'; 
+--  signal w_sw1: std_logic := '0';
+ -- signal w_sw0: std_logic := '0';
+ -- signal w_sw2: std_logic := '0';
+ -- signal w_Cout1: std_logic := '0';
+ -- signal w_Cout2: std_logic := '0';
+ -- signal w_S1: std_logic := '0';
+ 
+ signal w_S1, w_Cout1, w_Cout2 : std_logic := '0';
+ 
 begin
 	-- PORT MAPS --------------------
+	
+	halfAdder1_inst: halfAdder -- inside the black box
+	port map (
+	i_A => sw(0),
+	i_B => sw(1),
+	o_S => w_S1,
+	o_Cout => w_Cout1
+	);
+	
+	halfAdder2_inst: halfAdder -- inside the black box
+	port map(
+	i_A => w_S1,
+	i_B => sw(2),
+	o_S =>  led(0),
+	o_Cout => w_Cout2
+	);
    
 	---------------------------------
 	
 	-- CONCURRENT STATEMENTS --------
-	 led(1) <= -- TODO
+	 led(1) <= w_Cout1 or w_Cout2;
 	---------------------------------
 end top_basys3_arch;

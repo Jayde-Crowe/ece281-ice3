@@ -15,7 +15,7 @@
 --| CREATED       : 01/17/2017
 --| DESCRIPTION   : This file implements a half adder test bench.
 --|
---| DOCUMENTATION : Modified slightly by Capt Johnson
+--| DOCUMENTATION : None
 --|
 --+----------------------------------------------------------------------------
 --|
@@ -55,43 +55,72 @@ entity halfAdder_tb is
 end halfAdder_tb;
 
 architecture test_bench of halfAdder_tb is 
-
-	-- Component Declaration	
+	
+  -- declare the component of your top-level design unit under test (UUT)
   component halfAdder is
 	port(
-		i_A     : in  std_logic; 
+		i_A     : in  std_logic; -- 1-bit input port
 		i_B     : in  std_logic; 
-		o_S     : out std_logic;
-		o_Cout  : out std_logic
-	);	
+		o_S     : out std_logic;  -- 1-bit output port
+								 -- (NOTE: NO semicolon on LAST port only!)
+		-- TODO:  Carry port
+		o_Cout : out std_logic
+	); -- the semicolon is here instead	
   end component;
 
   
-  signal i_sw1, i_sw0 : std_logic := '0'; 
-  signal o_led1, o_led0 : std_logic := '0';
-    
+  -- declare signals needed to stimulate the UUT inputs
+  signal w_sw1 : std_logic := '0';
+  -- TODO:  sw0 signal
+  signal w_sw0 : std_logic := '0';
+  
+  -- also need signals for the outputs of the UUT
+  signal w_led1 : std_logic := '0';
+  -- TODO:  led0 signal
+  signal w_led0 : std_logic := '0';
+
+  
 begin
 	-- PORT MAPS ----------------------------------------
+
+	-- map ports for any component instances (port mapping is like wiring hardware)
 	halfAdder_inst : halfAdder port map (
-		i_A     => i_sw1,
-		i_B     => i_sw0,
-		o_S     => o_led0,
-		o_Cout  => o_led1
+		i_A     => w_sw1, -- notice comma (not a semicolon)
+		i_B     => w_sw0,
+		o_S     => w_led0, -- no comma on LAST one
+		-- TODO:  map Cout 
+		o_Cout => w_led1
 	);
-	-----------------------------------------------------
+
+	-- CONCURRENT STATEMENTS ----------------------------
+
 	
-	-- PROCESSES ----------------------------------------	
-	-- Test plan process
-	-- Testing each combination of i_A and i_B (4 total)
+	-- PROCESSES ----------------------------------------
+	
+	-- Test Plan Process --------------------------------
+	-- Implement the test plan here.  Body of process is continuously from time = 0  
 	test_process : process 
 	begin
 	
-		i_sw1 <= '0'; i_sw0 <= '0'; wait for 10 ns;
-		i_sw1 <= '0'; i_sw0 <= '1'; wait for 10 ns;
-		i_sw1 <= '1'; i_sw0 <= '0'; wait for 10 ns;
-		i_sw1 <= '1'; i_sw0 <= '1';	
-		wait; -- wait forever
+		 w_sw1 <= '0'; w_sw0 <= '0'; wait for 10 ns;
+            assert w_led0 = '0' report "bad sum" severity error;
+            assert w_led1 = '0' report "bad carry" severity error;
+		-- TODO:  rest of test plan
 		
+		 w_sw1 <= '1'; w_sw0 <= '0'; wait for 10 ns;
+		     assert w_led0 = '1' report "bad sum" severity error;
+		     assert w_led1 = '0' report "bad carry" severity error;
+		     
+		 w_sw1 <= '0'; w_sw0 <= '1'; wait for 10 ns;
+		     assert w_led0 = '1' report "bad sum" severity error;
+             assert w_led1 = '0' report "bad carry" severity error;
+             
+          w_sw1 <= '1'; w_sw0 <= '1'; wait for 10 ns;
+            assert w_led0 = '0' report "bad sum" severity error;
+            assert w_led1 = '1' report "bad carry" severity error;  
+		
+		
+		wait; -- wait forever
 	end process;	
 	-----------------------------------------------------	
 	
